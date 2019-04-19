@@ -8,6 +8,7 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
+  Text,
   View
 } from 'react-native'
 import { WebView } from 'react-native-webview'
@@ -23,6 +24,7 @@ class MarketplaceScreen extends Component {
     super(props)
 
     this.state = {
+      webviewErrorDescription: null,
       modals: []
     }
 
@@ -126,7 +128,7 @@ class MarketplaceScreen extends Component {
   handleSignedMessage({ data, signedMessage }) {
     // Close matching modal
     const modal = this.state.modals.find(
-      m => m.msgData && m.msgData.data === data
+      m => m.msgData && m.msgData.data === datat sta
     )
     // Toggle the matching modal and return the hash
     this.toggleModal(modal, signedMessage.signature)
@@ -148,6 +150,20 @@ class MarketplaceScreen extends Component {
   }
 
   render() {
+    if (this.state.webviewErrorDescription === 'net::ERR_INTERNET_DISCONNECTED') {
+      return this.renderInternetDisconnected()
+    } else {
+      return this.renderWebview()
+    }
+  }
+
+  renderInternetDisconnected() {
+    return (
+      <Text>Internet disconnected</Text>
+    )
+  }
+
+  renderWebview() {
     const injectedJavaScript = `
       if (!window.__mobileBridge || !window.__mobileBridgePlatform) {
         window.__mobileBridge = true;
@@ -171,6 +187,10 @@ class MarketplaceScreen extends Component {
           onMessage={this.onWebViewMessage}
           onLoadProgress={() => {
             this.dappWebView.injectJavaScript(injectedJavaScript)
+          }}
+          onError={syntheticEvent => {
+            const { nativeEvent } = syntheticEvent
+            this.setState({ webviewErrorDescription: nativeEvent.description })
           }}
           allowsBackForwardNavigationGestures
         />
