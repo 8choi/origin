@@ -3,8 +3,10 @@
 import React, { Component } from 'react'
 import {
   DeviceEventEmitter,
+  Dimensions,
   Modal,
   Platform,
+  ScrollView,
   StyleSheet,
   StatusBar,
   View
@@ -90,6 +92,12 @@ class MarketplaceScreen extends Component {
     }
   }
 
+  scrollHandler(scrollTop) {
+    if (scrollTop === 0) {
+      this.dappWebView.injectJavaScript(`document.location.reload()`)
+    }
+  }
+
   getAccounts() {
     const { wallet } = this.props
     const filteredAccounts = wallet.accounts.filter(
@@ -153,11 +161,16 @@ class MarketplaceScreen extends Component {
         if (!window.__mobileBridge || !window.__mobileBridgePlatform) {
           window.__mobileBridge = true;
           window.__mobileBridgePlatform = '${Platform.OS}';
+          window.onscroll = function() {
+            console.log('Scrollah')
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              targetFunc: 'scrollHandler',
+              data: document.documentElement.scrollTop || document.body.scrollTop
+            }))
+          }
         }
       })();
     `
-
-    const { modals } = this.state
 
     // Use key of network id on safeareaview to force a remount of component on
     // network changes
@@ -168,18 +181,31 @@ class MarketplaceScreen extends Component {
         forceInset={{ top: 'always' }}
       >
         <StatusBar backgroundColor="white" barStyle="dark-content" />
-        <WebView
-          ref={webview => {
-            this.dappWebView = webview
+
+        <ScrollView
+          onLayout={event => {
+            console.log(event)
+            this.setState({scrollViewHeight: event.nativeEvent.layout.height})
           }}
-          source={{ uri: this.props.settings.network.dappUrl }}
-          onMessage={this.onWebViewMessage}
-          onLoadProgress={() => {
-            this.dappWebView.injectJavaScript(injectedJavaScript)
-          }}
-          allowsBackForwardNavigationGestures
-        />
-        {modals.map((modal, index) => {
+        >
+          <WebView
+            ref={webview => {
+              this.dappWebView = webview
+            }}
+            source={{ uri: this.props.settings.network.dappUrl }}
+            onMessage={this.onWebViewMessage}
+            onLoadProgress={() => {
+              this.dappWebView.injectJavaScript(injectedJavaScript)
+            }}
+            allowsBackForwardNavigationGestures
+            style={{
+              width: Dimensions.get('window').width,
+              height:this.state.scrollViewHeight
+            }}
+          />
+
+        </ScrollView>
+        {this.state.modals.map((modal, index) => {
           let card
           if (modal.type === 'enableNotifications') {
             card = (
