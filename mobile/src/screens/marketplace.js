@@ -185,7 +185,7 @@ class MarketplaceScreen extends Component {
         <ScrollView
           onLayout={event => {
             console.log(event)
-            this.setState({scrollViewHeight: event.nativeEvent.layout.height})
+            this.setState({ scrollViewHeight: event.nativeEvent.layout.height })
           }}
         >
           <WebView
@@ -200,10 +200,9 @@ class MarketplaceScreen extends Component {
             allowsBackForwardNavigationGestures
             style={{
               width: Dimensions.get('window').width,
-              height:this.state.scrollViewHeight
+              height: this.state.scrollViewHeight
             }}
           />
-
         </ScrollView>
         {this.state.modals.map((modal, index) => {
           let card
