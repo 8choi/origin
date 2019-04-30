@@ -9,6 +9,11 @@ import {
   StatusBar,
   View
 } from 'react-native'
+import {
+  Directions,
+  FlingGestureHandler,
+  State
+} from 'react-native-gesture-handler'
 import { WebView } from 'react-native-webview'
 import { connect } from 'react-redux'
 import SafeAreaView from 'react-native-safe-area-view'
@@ -22,7 +27,9 @@ class MarketplaceScreen extends Component {
     super(props)
 
     this.state = {
-      modals: []
+      modals: [],
+      canGoBack: false,
+      canGoForward: false
     }
 
     DeviceEventEmitter.addListener(
@@ -41,6 +48,9 @@ class MarketplaceScreen extends Component {
     )
 
     this.onWebViewMessage = this.onWebViewMessage.bind(this)
+    this.onRightFling = this.onRightFling.bind(this)
+    this.onLeftFling = this.onLeftFling.bind(this)
+    this.onNavigationStateChange = this.onNavigationStateChange.bind(this)
     this.toggleModal = this.toggleModal.bind(this)
   }
 
@@ -92,6 +102,27 @@ class MarketplaceScreen extends Component {
         ]
       }))
     }
+  }
+
+  onRightFling({ nativeEvent }) {
+    if (nativeEvent.state === State.ACTIVE) {
+      console.debug('Go back')
+      this.dappWebView.goBack()
+    }
+  }
+
+  onLeftFling({ nativeEvent }) {
+    if (nativeEvent.state === State.ACTIVE) {
+      console.debug('Go forward')
+      this.dappWebView.goForward()
+    }
+  }
+
+  onNavigationStateChange(navState) {
+    this.setState({
+      canGoBack: navState.canGoBack,
+      canGoForward: navState.canGoForward
+    })
   }
 
   getAccounts() {
@@ -185,93 +216,106 @@ class MarketplaceScreen extends Component {
     // Use key of network id on safeareaview to force a remount of component on
     // network changes
     return (
-      <SafeAreaView
-        key={this.props.settings.network.id}
-        style={styles.sav}
-        forceInset={{ top: 'always' }}
+      <FlingGestureHandler
+        direction={Directions.RIGHT}
+        onHandlerStateChange={this.onRightFling}
       >
-        <StatusBar backgroundColor="white" barStyle="dark-content" />
-        <WebView
-          ref={webview => {
-            this.dappWebView = webview
-          }}
-          source={{ uri: marketplaceUrl }}
-          onMessage={this.onWebViewMessage}
-          onLoad={() => {
-            this.injectMessagingKeys()
-          }}
-          allowsBackForwardNavigationGestures
-          startInLoadingState={true}
-          renderLoading={() => {
-            return (
-              <View style={styles.loading}>
-                <ActivityIndicator size="large" color="black" />
-              </View>
-            )
-          }}
-        />
-        {modals.map((modal, index) => {
-          let card
-          if (modal.type === 'enableNotifications') {
-            card = (
-              <NotificationCard
-                onRequestClose={() => this.toggleModal(modal)}
-              />
-            )
-          } else if (modal.type === 'processTransaction') {
-            card = (
-              <TransactionCard
-                msgData={modal.msgData}
-                onConfirm={() => {
-                  DeviceEventEmitter.emit('sendTransaction', modal.msgData.data)
-                }}
-                onRequestClose={() =>
-                  this.toggleModal(modal, {
-                    message: 'User denied transaction signature'
-                  })
-                }
-              />
-            )
-          } else if (modal.type === 'signMessage') {
-            card = (
-              <SignatureCard
-                msgData={modal.msgData}
-                onConfirm={() => {
-                  DeviceEventEmitter.emit('signMessage', modal.msgData.data)
-                }}
-                onRequestClose={() =>
-                  this.toggleModal(modal, {
-                    message: 'User denied transaction signature'
-                  })
-                }
-              />
-            )
-          }
-
-          return (
-            <Modal
-              key={index}
-              animationType="fade"
-              transparent={true}
-              visible={true}
-              onRequestClose={() => {
-                this.toggalModal(modal)
+        <FlingGestureHandler
+          direction={Directions.LEFT}
+          onHandlerStateChange={this.onLeftFling}
+        >
+          <SafeAreaView
+            key={this.props.settings.network.id}
+            style={styles.sav}
+            forceInset={{ top: 'always' }}
+          >
+            <StatusBar backgroundColor="white" barStyle="dark-content" />
+            <WebView
+              ref={webview => {
+                this.dappWebView = webview
               }}
-            >
-              <SafeAreaView style={styles.container}>
-                <View
-                  style={styles.transparent}
-                  onPress={() => {
-                    this.toggleModal(modal)
+              source={{ uri: marketplaceUrl }}
+              onMessage={this.onWebViewMessage}
+              onLoad={() => {
+                this.injectMessagingKeys()
+              }}
+              onNavigationStateChange={this.onNavigationStateChange}
+              startInLoadingState={true}
+              renderLoading={() => {
+                return (
+                  <View style={styles.loading}>
+                    <ActivityIndicator size="large" color="black" />
+                  </View>
+                )
+              }}
+            />
+            {modals.map((modal, index) => {
+              let card
+              if (modal.type === 'enableNotifications') {
+                card = (
+                  <NotificationCard
+                    onRequestClose={() => this.toggleModal(modal)}
+                  />
+                )
+              } else if (modal.type === 'processTransaction') {
+                card = (
+                  <TransactionCard
+                    msgData={modal.msgData}
+                    onConfirm={() => {
+                      DeviceEventEmitter.emit(
+                        'sendTransaction',
+                        modal.msgData.data
+                      )
+                    }}
+                    onRequestClose={() =>
+                      this.toggleModal(modal, {
+                        message: 'User denied transaction signature'
+                      })
+                    }
+                  />
+                )
+              } else if (modal.type === 'signMessage') {
+                card = (
+                  <SignatureCard
+                    msgData={modal.msgData}
+                    onConfirm={() => {
+                      DeviceEventEmitter.emit('signMessage', modal.msgData.data)
+                    }}
+                    onRequestClose={() =>
+                      this.toggleModal(modal, {
+                        message: 'User denied transaction signature'
+                      })
+                    }
+                  />
+                )
+              }
+
+              return (
+                <Modal
+                  key={index}
+                  animationType="fade"
+                  transparent={true}
+                  visible={true}
+                  onRequestClose={() => {
+                    this.toggalModal(modal)
                   }}
                 >
-                  {card}
-                </View>
-              </SafeAreaView>
-            </Modal>
-          )
-        })}
-      </SafeAreaView>
+                  <SafeAreaView style={styles.container}>
+                    <View
+                      style={styles.transparent}
+                      onPress={() => {
+                        this.toggleModal(modal)
+                      }}
+                    >
+                      {card}
+                    </View>
+                  </SafeAreaView>
+                </Modal>
+              )
+            })}
+          </SafeAreaView>
+        </FlingGestureHandler>
+      </FlingGestureHandler>
     )
   }
 }
