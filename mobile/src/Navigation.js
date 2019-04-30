@@ -129,7 +129,7 @@ const OriginNavigator = createBottomTabNavigator(
   }
 )
 
-const OriginMarketplaceApp = createAppContainer(OriginNavigator);
+const OriginMarketplaceApp = createAppContainer(OriginNavigator)
 
 export {
   MarketplaceStack,

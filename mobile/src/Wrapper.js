@@ -3,9 +3,7 @@
 import React, { Component } from 'react'
 import { DeviceEventEmitter, Image, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
-import {
-  createAppContainer,
-} from 'react-navigation'
+import { createAppContainer } from 'react-navigation'
 
 import NavigationService from './NavigationService'
 import Onboarding from 'components/onboarding'
@@ -56,7 +54,9 @@ class OriginWrapper extends Component {
   renderOnboardingStack() {
     const OnboardingStackContainer = createAppContainer(OnboardingStack)
     return (
-      <OnboardingStackContainer screenProps={{ smallScreen: this.props.smallScreen }} />
+      <OnboardingStackContainer
+        screenProps={{ smallScreen: this.props.smallScreen }}
+      />
     )
   }
 

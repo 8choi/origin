@@ -30,10 +30,10 @@ subprojects {
 
 buildscript {
     ext {
-        //buildToolsVersion = "26.1.1"
         minSdkVersion = 21
-        compileSdkVersion = 27
-        targetSdkVersion = 27
+        compileSdkVersion = 26
+        targetSdkVersion = 26
+        buildToolsVersion = "26.0.2"
         supportLibVersion = "27.1.0"
     }
     repositories {
