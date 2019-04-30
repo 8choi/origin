@@ -3,10 +3,13 @@
 import React, { Component } from 'react'
 import { DeviceEventEmitter, Image, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
+import {
+  createAppContainer,
+} from 'react-navigation'
 
 import NavigationService from './NavigationService'
 import Onboarding from 'components/onboarding'
-import { OriginNavigator, OnboardingStack } from './Navigation'
+import { OriginMarketplaceApp, OnboardingStack } from './Navigation'
 import { setCarouselStatus } from 'actions/Activation'
 
 const IMAGES_PATH = '../assets/images/'
@@ -46,13 +49,14 @@ class OriginWrapper extends Component {
     } else if (!wallet.accounts.length) {
       return this.renderOnboardingStack()
     } else {
-      return this.renderNavigator()
+      return this.renderApp()
     }
   }
 
   renderOnboardingStack() {
+    const OnboardingStackContainer = createAppContainer(OnboardingStack)
     return (
-      <OnboardingStack screenProps={{ smallScreen: this.props.smallScreen }} />
+      <OnboardingStackContainer screenProps={{ smallScreen: this.props.smallScreen }} />
     )
   }
 
@@ -124,9 +128,9 @@ class OriginWrapper extends Component {
     )
   }
 
-  renderNavigator() {
+  renderApp() {
     return (
-      <OriginNavigator
+      <OriginMarketplaceApp
         ref={navigatorRef =>
           NavigationService.setTopLevelNavigator(navigatorRef)
         }

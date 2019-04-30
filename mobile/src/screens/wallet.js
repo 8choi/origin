@@ -120,7 +120,6 @@ const styles = StyleSheet.create({
     paddingVertical: 22
   },
   container: {
-    backgroundColor: '#f7f8f8',
     flex: 1,
     justifyContent: 'center',
     padding: 20

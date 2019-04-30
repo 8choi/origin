@@ -1,6 +1,7 @@
 import React from 'react'
 import { Image } from 'react-native'
 import {
+  createAppContainer,
   createBottomTabNavigator,
   createStackNavigator
 } from 'react-navigation'
@@ -14,7 +15,7 @@ import AccountScreen from 'screens/account'
 
 const IMAGES_PATH = '../assets/images/'
 
-const navigationOptions = () => ({
+const defaultNavigationOptions = () => ({
   headerBackTitle: ' ',
   headerStyle: {
     backgroundColor: 'white'
@@ -26,7 +27,7 @@ const MarketplaceStack = createStackNavigator(
     Marketplace: MarketplaceScreen
   },
   {
-    navigationOptions
+    defaultNavigationOptions
   }
 )
 
@@ -35,7 +36,10 @@ const WalletStack = createStackNavigator(
     Wallet: WalletScreen
   },
   {
-    navigationOptions
+    defaultNavigationOptions,
+    cardStyle: {
+      backgroundColor: '#f7f8f8'
+    }
   }
 )
 
@@ -47,7 +51,7 @@ const SettingsStack = createStackNavigator(
   },
   {
     initialRouteName: 'Settings',
-    navigationOptions
+    defaultNavigationOptions
   }
 )
 
@@ -57,7 +61,7 @@ const OnboardingStack = createStackNavigator(
   },
   {
     initialRouteName: 'Fork',
-    navigationOptions: () => ({
+    defaultNavigationOptions: () => ({
       headerBackTitle: ' ',
       headerStyle: {
         backgroundColor: '#293f55',
@@ -82,7 +86,7 @@ const OriginNavigator = createBottomTabNavigator(
   {
     initialRouteName: 'Marketplace',
     order: ['Marketplace', 'Wallet', 'Settings'],
-    navigationOptions: ({ navigation }) => ({
+    defaultNavigationOptions: ({ navigation }) => ({
       tabBarIcon: ({ focused }) => {
         const { routeName } = navigation.state
 
@@ -125,10 +129,12 @@ const OriginNavigator = createBottomTabNavigator(
   }
 )
 
+const OriginMarketplaceApp = createAppContainer(OriginNavigator);
+
 export {
   MarketplaceStack,
   WalletStack,
   SettingsStack,
   OnboardingStack,
-  OriginNavigator
+  OriginMarketplaceApp
 }
