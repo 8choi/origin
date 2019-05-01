@@ -48,7 +48,6 @@ class MarketplaceScreen extends Component {
     this.onWebViewMessage = this.onWebViewMessage.bind(this)
     this.onRightFling = this.onRightFling.bind(this)
     this.onLeftFling = this.onLeftFling.bind(this)
-    this.onNavigationStateChange = this.onNavigationStateChange.bind(this)
     this.toggleModal = this.toggleModal.bind(this)
   }
 
