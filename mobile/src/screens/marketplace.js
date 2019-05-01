@@ -27,9 +27,7 @@ class MarketplaceScreen extends Component {
     super(props)
 
     this.state = {
-      modals: [],
-      canGoBack: false,
-      canGoForward: false
+      modals: []
     }
 
     DeviceEventEmitter.addListener(
@@ -116,13 +114,6 @@ class MarketplaceScreen extends Component {
       console.debug('Go forward')
       this.dappWebView.goForward()
     }
-  }
-
-  onNavigationStateChange(navState) {
-    this.setState({
-      canGoBack: navState.canGoBack,
-      canGoForward: navState.canGoForward
-    })
   }
 
   getAccounts() {
