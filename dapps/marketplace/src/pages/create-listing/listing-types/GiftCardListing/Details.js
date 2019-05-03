@@ -102,7 +102,9 @@ class Details extends Component {
                           ? `${this.ipfsGateway}/ipfs/${
                               GiftCardRetailers[this.state.retailer]
                             }`
-                          : `${this.ipfsGateway}/ipfs/QmVffY9nUZYPt8uBy1ra9aMvixc1NC6jT7JjFNUgsuqbpJ`
+                          : `${
+                              this.ipfsGateway
+                            }/ipfs/QmVffY9nUZYPt8uBy1ra9aMvixc1NC6jT7JjFNUgsuqbpJ`
                       }
                     />
                   </div>
