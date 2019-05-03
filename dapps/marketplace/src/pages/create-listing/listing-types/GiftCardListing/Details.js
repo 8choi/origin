@@ -16,10 +16,12 @@ import { GiftCardRetailers } from 'constants/GiftCardRetailers'
 import { formInput, formFeedback } from 'utils/formHelpers'
 
 import PricingChooser from '../_PricingChooser'
+import withConfig from 'hoc/withConfig'
 
 class Details extends Component {
   constructor(props) {
     super(props)
+    this.ipfsGateway = props.config.ipfsGateway
     props.listing.media.shift() // Remove first image if there (It will be card image)
     this.state = omit(props.listing, 'valid')
   }
@@ -97,10 +99,10 @@ class Details extends Component {
                     <img
                       src={
                         this.state.retailer
-                          ? `http://localhost:8080/ipfs/${
+                          ? `${this.ipfsGateway}/ipfs/${
                               GiftCardRetailers[this.state.retailer]
                             }`
-                          : `http://localhost:8080/ipfs/QmVffY9nUZYPt8uBy1ra9aMvixc1NC6jT7JjFNUgsuqbpJ`
+                          : `${this.ipfsGateway}/ipfs/QmVffY9nUZYPt8uBy1ra9aMvixc1NC6jT7JjFNUgsuqbpJ`
                       }
                     />
                   </div>
@@ -368,7 +370,7 @@ class Details extends Component {
   }
 }
 
-export default Details
+export default withConfig(Details)
 
 require('react-styl')(`
   .create-listing .create-listing-step-2 .pricing-chooser
